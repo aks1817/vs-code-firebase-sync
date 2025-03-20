@@ -1,0 +1,68 @@
+{
+  "name": "vs-code-firebase-sync",
+  "displayName": "VS Code Firebase Sync",
+  "description": "A VS Code extension to sync project files with Firebase",
+  "version": "0.0.1",
+  "publisher": "Anurag",
+  "engines": {
+    "vscode": "^1.98.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onView:firebaseSidebar",
+    "onCommand:firebaseSync.refresh"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "firebaseSync",
+          "title": "Firebase Sync",
+          "icon": "media/icon.png"
+        }
+      ]
+    },
+    "views": {
+      "firebaseSync": [
+        {
+          "id": "firebaseSidebar",
+          "name": "Firebase Sync"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "firebaseSync.refresh",
+        "title": "Refresh Firebase Projects"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "webpack",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.10",
+    "@babel/preset-env": "^7.26.9",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.98.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1",
+    "@vscode/vsce": "^3.3.0",
+    "babel-loader": "^10.0.0",
+    "eslint": "^9.21.0",
+    "webpack": "^5.98.0",
+    "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "@vscode/webview-ui-toolkit": "^1.4.0",
+    "firebase": "^11.5.0",
+    "firebase-admin": "^13.2.0",
+    "uuid": "^11.1.0"
+  }
+}
