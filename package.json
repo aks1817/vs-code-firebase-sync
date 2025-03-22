@@ -13,31 +13,82 @@
   "activationEvents": [
     "onStartupFinished",
     "onView:firebaseSidebar",
-    "onCommand:firebaseSync.refresh"
+    "onView:firebaseSidebarTree",
+    "onCommand:firebaseSync.refresh",
+    "onCommand:firebaseSync.saveProject",
+    "onCommand:firebaseSync.updateProject",
+    "onCommand:firebaseSync.deleteProject"
   ],
   "main": "./extension.js",
   "contributes": {
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "firebaseSync",
+          "id": "firebaseSyncContainer",
           "title": "Firebase Sync",
           "icon": "media/icon.png"
         }
       ]
     },
     "views": {
-      "firebaseSync": [
+      "firebaseSyncContainer": [
         {
+          "type": "webview",
           "id": "firebaseSidebar",
           "name": "Firebase Sync"
+        },
+        {
+          "id": "firebaseSidebarTree",
+          "name": "Firebase Projects"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "firebaseSync.refresh",
+          "when": "view == firebaseSidebarTree",
+          "group": "navigation"
+        },
+        {
+          "command": "firebaseSync.saveProject",
+          "when": "view == firebaseSidebarTree",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "firebaseSync.updateProject",
+          "when": "view == firebaseSidebarTree && viewItem == project",
+          "group": "inline"
+        },
+        {
+          "command": "firebaseSync.deleteProject",
+          "when": "view == firebaseSidebarTree && viewItem == project",
+          "group": "inline"
         }
       ]
     },
     "commands": [
       {
         "command": "firebaseSync.refresh",
-        "title": "Refresh Firebase Projects"
+        "title": "Refresh Firebase Projects",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "firebaseSync.saveProject",
+        "title": "Save Project",
+        "icon": "$(add)"
+      },
+      {
+        "command": "firebaseSync.updateProject",
+        "title": "Update Project",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "firebaseSync.deleteProject",
+        "title": "Delete Project",
+        "icon": "$(trash)"
       }
     ]
   },

@@ -3,7 +3,12 @@ const vscode = require("vscode");
 function getCurrentWorkspaceFiles() {
   return vscode.workspace
     .findFiles("**/*", "**/node_modules/**")
-    .then((files) => files.map((file) => file.fsPath));
+    .then((files) => files.map((file) => file.fsPath))
+    .catch((err) => {
+      console.error("Error finding workspace files:", err);
+      vscode.window.showErrorMessage("Error finding workspace files.");
+      return [];
+    });
 }
 
 function getOpenFiles() {
