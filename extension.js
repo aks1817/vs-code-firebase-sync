@@ -5,6 +5,12 @@ const fs = require("fs");
 const SidebarView = require("./src/views/SidebarView");
 const { getCurrentWorkspaceFiles } = require("./src/utils/vscodeHelper");
 const { getProjectFiles } = require("./src/firebase/firestoreService");
+const {
+  initAuthStateListener,
+  restoreAuthState,
+  getAuthStateChangeEvent,
+  getCurrentUser,
+} = require("./src/firebase/authService");
 
 // Load Firebase credentials (make sure this file is present)
 const serviceAccountPath = path.join(__dirname, "serviceAccountKey.json");
@@ -18,6 +24,9 @@ const serviceAccount = require(serviceAccountPath);
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
+
+// Initialize auth state listener for client SDK
+initAuthStateListener();
 
 function activate(context) {
   console.log("Firebase Sync extension is now active");
@@ -42,10 +51,20 @@ function activate(context) {
     "firebaseSync.refresh",
     async () => {
       treeDataProvider.refresh();
-      vscode.window.showInformationMessage("Firebase Sync Refreshed!");
     }
   );
   context.subscriptions.push(refreshDisposable);
+
+  // Register refresh sidebar command
+  const refreshSidebarDisposable = vscode.commands.registerCommand(
+    "firebaseSync.refreshSidebar",
+    async () => {
+      if (sidebarView) {
+        await sidebarView.updateWebviewContent();
+      }
+    }
+  );
+  context.subscriptions.push(refreshSidebarDisposable);
 
   // Register save project command
   const saveProjectDisposable = vscode.commands.registerCommand(
@@ -116,6 +135,26 @@ function activate(context) {
     }
   );
   context.subscriptions.push(deleteProjectDisposable);
+
+  // Subscribe to auth state changes to update the tree view
+  const authStateChangeListener = getAuthStateChangeEvent()((user) => {
+    treeDataProvider.refresh();
+  });
+  context.subscriptions.push({
+    dispose: () => authStateChangeListener.dispose(),
+  });
+
+  // Restore auth state from storage
+  restoreAuthState(context).then((success) => {
+    if (success) {
+      console.log("Auth state restored successfully");
+      // Refresh UI components
+      vscode.commands.executeCommand("firebaseSync.refreshSidebar");
+      vscode.commands.executeCommand("firebaseSync.refresh");
+    } else {
+      console.log("No stored auth state found or restoration failed");
+    }
+  });
 }
 
 class FirebaseSyncProvider {
@@ -133,6 +172,18 @@ class FirebaseSyncProvider {
   }
 
   async getChildren(element) {
+    // Check if user is authenticated
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+      // If not authenticated, show a message to sign in
+      return [
+        new vscode.TreeItem(
+          "Please sign in to view projects",
+          vscode.TreeItemCollapsibleState.None
+        ),
+      ];
+    }
+
     if (!element) {
       // Fetch top-level projects
       return this.getProjects();

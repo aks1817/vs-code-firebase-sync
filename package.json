@@ -15,6 +15,7 @@
     "onView:firebaseSidebar",
     "onView:firebaseSidebarTree",
     "onCommand:firebaseSync.refresh",
+    "onCommand:firebaseSync.refreshSidebar",
     "onCommand:firebaseSync.saveProject",
     "onCommand:firebaseSync.updateProject",
     "onCommand:firebaseSync.deleteProject"
@@ -73,6 +74,11 @@
       {
         "command": "firebaseSync.refresh",
         "title": "Refresh Firebase Projects",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "firebaseSync.refreshSidebar",
+        "title": "Refresh Firebase Sidebar",
         "icon": "$(refresh)"
       },
       {
